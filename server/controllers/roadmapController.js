@@ -62,7 +62,10 @@ export async function handleGenerateRoadmap(req, res) {
 
 export function handleGetCareers(req, res) {
   try {
-    const filePath = path.join(__dirname, "..", "..", "data", "careers.json");
+    const localPath = path.join(__dirname, "..", "data", "careers.json");
+    const rootPath = path.join(__dirname, "..", "..", "data", "careers.json");
+    const filePath = fs.existsSync(localPath) ? localPath : rootPath;
+
     if (fs.existsSync(filePath)) {
       const data = fs.readFileSync(filePath, "utf8");
       res.json(JSON.parse(data));
