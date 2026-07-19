@@ -10,11 +10,17 @@ export async function fetchCareers() {
 }
 
 export async function askAiMentor(question) {
-  const res = await fetch("/api/ask-ai", {
-    method: "POST",
+  const res = await fetch(
+    "https://career-genie-ai-hackathon-production.up.railway.app/api/ask-ai",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question })
+    }
+  ); method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question })
-  });
-  if (!res.ok) throw new Error("AI Mentor service unavailable");
-  return await res.json();
+  body: JSON.stringify({ question })
+});
+if (!res.ok) throw new Error("AI Mentor service unavailable");
+return await res.json();
 }
