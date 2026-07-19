@@ -1,0 +1,81 @@
+body{
+    background:#f5f9ff;
+}
+
+h1{
+    margin-top:80px;
+}
+
+button{
+    padding:12px 30px;
+    border-radius:30px;
+}
+
+.card{
+    transition:0.3s;
+    border-radius:20px;
+}
+
+.card:hover{
+    transform:translateY(-10px);
+}
+
+.timeline{
+
+border-left:5px solid #6C63FF;
+
+padding-left:30px;
+
+margin-left:20px;
+
+}
+
+.timeline-item{
+
+background:white;
+
+padding:20px;
+
+margin-bottom:25px;
+
+border-radius:15px;
+
+box-shadow:0 5px 15px rgba(0,0,0,.1);
+
+transition:.3s;
+
+}
+
+.timeline-item:hover{
+
+transform:translateX(10px);
+
+}
+
+/* Progress Tracker Completed Step Styling */
+.timeline-item.completed {
+    background-color: #e8f5e9 !important;
+    border-left: 5px solid #2e7d32 !important;
+}
+
+.timeline-item.completed .step-description {
+    text-decoration: line-through;
+    color: #81c784 !important;
+}
+
+.timeline-item.completed h5 {
+    color: #2e7d32 !important;
+}
+
+/* Custom size for check-box */
+.step-checkbox {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    border: 2px solid #6C63FF;
+}
+
+.step-checkbox:checked {
+    background-color: #2e7d32;
+    border-color: #2e7d32;
+}

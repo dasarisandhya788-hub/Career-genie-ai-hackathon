@@ -1,0 +1,55 @@
+@import "./variables.css";
+@import "./animations.css";
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--light-bg);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.card {
+  border-radius: var(--card-radius);
+}
+
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: #e9ecef;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+  background: #ffffff;
+  padding: 1.25rem 1.5rem;
+  border-radius: 14px;
+  border: 1px solid #e9ecef;
+  transition: var(--transition-smooth);
+}
+
+.timeline-item.completed {
+  border-color: #198754;
+  background-color: #f8fff9;
+}
+
+.step-checkbox {
+  width: 1.3rem;
+  height: 1.3rem;
+  cursor: pointer;
+}

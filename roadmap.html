@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Career Roadmap</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+</head>
+<body>
+
+<div class="container mt-5">
+
+<h1 class="text-center mb-5 text-primary">
+    🚀 <span id="roadmapTitle"></span> Roadmap
+</h1>
+
+<div class="alert alert-info text-center">
+
+<h4>
+
+Welcome,
+
+<span id="studentName"></span>
+
+</h4>
+
+<p>
+
+Your Goal:
+
+<b id="careerGoal"></b>
+
+</p>
+
+</div>
+
+<!-- Progress Tracker Card -->
+<div class="card shadow p-4 mb-4">
+    <h4 class="mb-3 text-primary fw-bold">🎯 Your Learning Progress</h4>
+    <div class="progress mb-3" style="height: 25px; border-radius: 12px;">
+        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success fw-bold" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+    </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span id="progressText" class="fw-bold text-secondary">Progress: 0 of 0 steps completed</span>
+        <span id="celebrationMessage" class="text-success fw-bold fs-5 animate-celebration" style="display: none;">🎉 Congratulations! You completed your roadmap!</span>
+    </div>
+</div>
+
+<div class="timeline" id="roadmapContainer"></div>
+
+
+</div>
+<div class="card shadow p-4 mt-5">
+
+<h3 class="text-center text-primary">
+🤖 Career Genie AI Mentor
+</h3>
+
+<input
+type="text"
+id="question"
+class="form-control mt-3"
+placeholder="Ask anything about your career...">
+
+<button
+class="btn btn-primary w-100 mt-3"
+onclick="askAI()">
+
+Ask AI
+
+</button>
+
+<div
+id="aiAnswer"
+class="alert alert-success mt-4"
+style="display:none;">
+
+</div>
+
+</div>
+
+
+<script>
+
+const name = localStorage.getItem("name");
+const career = localStorage.getItem("career") || "Software Engineer";
+
+document.getElementById("studentName").innerHTML = name;
+document.getElementById("careerGoal").innerHTML = career;
+document.getElementById("roadmapTitle").innerHTML = career;
+
+let roadmap = [];
+let completedSteps = [];
+let progressKey = "";
+
+// Dynamic database load
+fetch("data/careers.json")
+    .then(res => res.json())
+    .then(careers => {
+        // Find matching career
+        const found = careers.find(c => c.name === career || c.id === career);
+        if (found) {
+            roadmap = found.roadmap;
+        } else {
+            // Default to software engineer
+            const se = careers.find(c => c.id === "software-engineer" || c.name === "Software Engineer");
+            roadmap = se ? se.roadmap : [];
+        }
+        
+        // Load progress from localStorage
+        progressKey = `progress_${career ? career.replace(/\s+/g, '') : 'default'}`;
+        completedSteps = JSON.parse(localStorage.getItem(progressKey)) || [];
+        
+        renderRoadmap();
+    })
+    .catch(err => {
+        console.error("Error loading careers database:", err);
+    });
+
+function renderRoadmap() {
+    let output = "";
+
+    roadmap.forEach(function(step, index){
+        const isCompleted = completedSteps.includes(index);
+        const checkedAttr = isCompleted ? "checked" : "";
+        const completedClass = isCompleted ? "completed" : "";
+
+        output += `
+            <div class="timeline-item ${completedClass}" id="item-${index}">
+                <div class="form-check d-flex align-items-center">
+                    <input class="form-check-input me-3 step-checkbox" type="checkbox" id="check-${index}" data-index="${index}" ${checkedAttr} onchange="toggleStep(${index})">
+                    <label class="form-check-label flex-grow-1" for="check-${index}">
+                        <h5 class="mb-1 fw-bold">Step ${index + 1}</h5>
+                        <p class="mb-0 text-muted step-description">${step}</p>
+                    </label>
+                </div>
+            </div>
+        `;
+    });
+
+    document.getElementById("roadmapContainer").innerHTML = output;
+    updateProgressUI(false);
+}
+
+// Function to update progress bar, text, status classes, and celebration
+function updateProgressUI(fireConfetti = false) {
+    const checkboxes = document.querySelectorAll(".step-checkbox");
+    const total = checkboxes.length;
+    let completedCount = 0;
+    
+    checkboxes.forEach(cb => {
+        const idx = parseInt(cb.getAttribute("data-index"));
+        const itemCard = document.getElementById(`item-${idx}`);
+        if (cb.checked) {
+            completedCount++;
+            if (itemCard) itemCard.classList.add("completed");
+        } else {
+            if (itemCard) itemCard.classList.remove("completed");
+        }
+    });
+
+    const percent = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+    
+    // Update progress bar
+    const progressBar = document.getElementById("progressBar");
+    if (progressBar) {
+        progressBar.style.width = `${percent}%`;
+        progressBar.setAttribute("aria-valuenow", percent);
+        progressBar.innerHTML = `${percent}%`;
+    }
+    
+    // Update text
+    const progressText = document.getElementById("progressText");
+    if (progressText) {
+        progressText.innerHTML = `Progress: ${completedCount} of ${total} steps completed`;
+    }
+    
+    // Show/hide celebration & confetti
+    const celebrationMessage = document.getElementById("celebrationMessage");
+    if (celebrationMessage) {
+        if (completedCount === total && total > 0) {
+            celebrationMessage.style.display = "block";
+            if (fireConfetti) {
+                triggerConfetti();
+            }
+        } else {
+            celebrationMessage.style.display = "none";
+        }
+    }
+}
+
+// Function to handle checkbox toggling
+function toggleStep(index) {
+    const cb = document.getElementById(`check-${index}`);
+    if (!cb) return;
+    
+    const isChecked = cb.checked;
+    const idxInArray = completedSteps.indexOf(index);
+    
+    if (isChecked) {
+        if (idxInArray === -1) {
+            completedSteps.push(index);
+        }
+    } else {
+        if (idxInArray !== -1) {
+            completedSteps.splice(idxInArray, 1);
+        }
+    }
+    
+    // Save to localStorage
+    localStorage.setItem(progressKey, JSON.stringify(completedSteps));
+    
+    // Update UI and trigger confetti only if it was newly completed to 100%
+    updateProgressUI(isChecked);
+}
+
+// Trigger Confetti using canvas-confetti library
+function triggerConfetti() {
+    if (typeof confetti === "function") {
+        confetti({
+            particleCount: 150,
+            spread: 80,
+            origin: { y: 0.6 }
+        });
+    } else {
+        console.log("Confetti library not loaded, but all steps completed!");
+    }
+}
+
+// Initial UI calculation
+updateProgressUI(false);
+
+</script>
+
+<script src="script.js"></script>
+
+</body>
+</html>

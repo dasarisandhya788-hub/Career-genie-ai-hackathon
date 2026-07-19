@@ -1,0 +1,117 @@
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
+import { loginUser } from "../services/authService.js";
+import { validateEmail } from "../utils/validators.js";
+
+export default function Login() {
+  const { refreshProfile } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!email.trim() || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const user = await loginUser(email.trim(), password);
+      if (user) {
+        await refreshProfile(user.uid);
+      }
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Login Error:", err);
+      let msg = err.message || "Invalid email or password.";
+      if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+        msg = "Invalid email or password.";
+      }
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth-container bg-light py-5 min-vh-100 d-flex align-items-center justify-content-center">
+      <div className="auth-card shadow-lg bg-white rounded-4 p-4" style={{ width: "100%", maxWidth: "440px" }}>
+        <div className="text-center mb-4">
+          <span className="fs-1">🧞‍♂️</span>
+          <h3 className="fw-bold text-primary mt-2">CareerGeenieAI</h3>
+          <p className="text-muted small">Sign in to your account</p>
+        </div>
+
+        {error && (
+          <div className="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+            {error}
+            <button type="button" className="btn-close" onClick={() => setError("")}></button>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Email Address</label>
+            <div className="input-group">
+              <span className="input-group-text bg-white border-end-0">
+                <i className="bi bi-envelope text-muted"></i>
+              </span>
+              <input
+                type="email"
+                className="form-control border-start-0"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="form-label fw-bold">Password</label>
+            <div className="input-group">
+              <span className="input-group-text bg-white border-end-0">
+                <i className="bi bi-lock text-muted"></i>
+              </span>
+              <input
+                type="password"
+                className="form-control border-start-0"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="btn btn-primary w-100 py-3 fw-bold shadow-sm rounded-pill mt-2"
+            disabled={loading}
+          >
+            {loading ? "Signing In..." : "Sign In"}
+          </button>
+        </form>
+
+        <div className="text-center mt-4 pt-3 border-top">
+          <p className="text-muted small mb-0">
+            Don't have an account? <Link to="/register" className="fw-bold text-primary text-decoration-none">Register here</Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
