@@ -14,13 +14,16 @@ export async function askAiMentor(question) {
     "https://career-genie-ai-hackathon-production.up.railway.app/api/ask-ai",
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({ question })
     }
-  ); method: "POST",
-    headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ question })
-});
-if (!res.ok) throw new Error("AI Mentor service unavailable");
-return await res.json();
+  );
+
+  if (!res.ok) {
+    throw new Error("AI Mentor service unavailable");
+  }
+
+  return await res.json();
 }
