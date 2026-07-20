@@ -30,39 +30,46 @@ export default function DiscoverCareer() {
   }, []);
 
   const interestsList = [
-    { id: "Coding", label: "Coding & Programming", icon: "bi-code-slash", color: "primary" },
+    { id: "Coding", label: "Coding & Software", icon: "bi-code-slash", color: "primary" },
     { id: "AI", label: "AI & Machine Learning", icon: "bi-cpu", color: "info" },
-    { id: "Data", label: "Data Science & Statistics", icon: "bi-graph-up-arrow", color: "success" },
-    { id: "Design", label: "UX/UI & Creative Design", icon: "bi-palette", color: "warning" },
-    { id: "Security", label: "Cybersecurity & Hacking", icon: "bi-danger", color: "danger" },
-    { id: "Cloud", label: "Cloud & Systems Architect", icon: "bi-cloud", color: "dark" },
-    { id: "Research", label: "Scientific Research", icon: "bi-journal-text", color: "secondary" }
+    { id: "Data", label: "Data Science & Stats", icon: "bi-graph-up-arrow", color: "success" },
+    { id: "Healthcare", label: "Healthcare & Medicine", icon: "bi-hospital", color: "danger" },
+    { id: "Finance", label: "Finance & Markets", icon: "bi-currency-dollar", color: "success" },
+    { id: "Design", label: "UX/UI & Creative Arts", icon: "bi-palette", color: "warning" },
+    { id: "Writing", label: "Writing & Journalism", icon: "bi-pencil-square", color: "primary" },
+    { id: "Law", label: "Law & Public Policy", icon: "bi-bank", color: "dark" },
+    { id: "Research", label: "Scientific Research", icon: "bi-journal-text", color: "secondary" },
+    { id: "Security", label: "Cybersecurity & Defence", icon: "bi-shield-lock", color: "danger" },
+    { id: "Business", label: "Business & Startups", icon: "bi-briefcase", color: "warning" },
+    { id: "Helping People", label: "Helping People", icon: "bi-heart", color: "danger" }
   ];
 
   const strengthsList = [
     { id: "Problem Solving", label: "Analytical Problem Solving", icon: "bi-lightbulb" },
-    { id: "Creativity", label: "Artistic & Tech Creativity", icon: "bi-brush" },
     { id: "Mathematics", label: "Logical & Math Reasoning", icon: "bi-calculator" },
-    { id: "Communication", label: "Communication & Teams", icon: "bi-chat-dots" },
+    { id: "Creativity", label: "Artistic & Visual Creativity", icon: "bi-brush" },
+    { id: "Communication", label: "Communication & Leadership", icon: "bi-chat-dots" },
     { id: "Leadership", label: "Project Leadership", icon: "bi-people" },
-    { id: "Attention", label: "Detail & Security Mindset", icon: "bi-zoom-in" }
+    { id: "Detail Orientation", label: "Attention to Detail", icon: "bi-zoom-in" },
+    { id: "Technical Aptitude", label: "Technical Aptitude", icon: "bi-tools" },
+    { id: "Empathy", label: "Empathy & Patient Care", icon: "bi-emoji-smile" }
   ];
 
-  // Compute trending dynamically from list (first 3 technology careers)
-  const trendingCareers = careersList
-    .filter((c) => c.category === "Technology")
-    .slice(0, 3)
-    .map((c) => ({
-      name: c.name,
-      icon: c.icon || "bi-code-slash"
-    }));
+  // Compute trending dynamically from list (first 3 technology/popular careers)
+  const trendingCareers = careersList.slice(0, 3).map((c) => ({
+    name: c.name,
+    icon: c.icon || "bi-code-slash"
+  }));
 
-  // Group and map categories dynamically
+  // Group and map categories dynamically from careersList
   const categoryMeta = {
-    "Technology": { icon: "bi-cpu-fill", color: "info" },
-    "Intermediate": { icon: "bi-mortarboard-fill", color: "warning" },
-    "Government": { icon: "bi-bank", color: "danger" },
-    "Business & Creative": { icon: "bi-briefcase-fill", color: "primary" }
+    "Technology": { icon: "bi-cpu-fill", color: "primary" },
+    "Healthcare & Medicine": { icon: "bi-hospital-fill", color: "danger" },
+    "Business & Finance": { icon: "bi-currency-dollar", color: "success" },
+    "Creative Arts & Design": { icon: "bi-palette-fill", color: "warning" },
+    "Law & Governance": { icon: "bi-bank", color: "dark" },
+    "Government & Defence": { icon: "bi-shield-shaded", color: "danger" },
+    "Sciences & Environment": { icon: "bi-tree-fill", color: "info" }
   };
 
   const careerCategories = Object.keys(categoryMeta).map((cat) => {
@@ -133,14 +140,13 @@ export default function DiscoverCareer() {
     setError("");
 
     try {
-      const isExploring = selectedCareer === "Not sure yet";
       await updateUserProfile(currentUser.uid, {
         dreamCareer: selectedCareer,
         careerGoal: selectedCareer,
-        careerStatus: isExploring ? "exploring" : "decided"
+        careerStatus: "decided"
       });
       await refreshProfile(currentUser.uid);
-      navigate(isExploring ? "/roadmap" : "/dashboard");
+      navigate("/roadmap");
     } catch (err) {
       console.error("Error saving dream career from discover:", err);
       setError("Failed to save your career selection. Please try again.");
@@ -151,11 +157,11 @@ export default function DiscoverCareer() {
 
   return (
     <div className="container py-5">
-      <div className="text-center mb-5" style={{ maxWidth: "700px", margin: "0 auto" }}>
+      <div className="text-center mb-5" style={{ maxWidth: "750px", margin: "0 auto" }}>
         <span className="fs-1">🧞‍♂️</span>
         <h1 className="display-6 fw-bold text-primary mt-3">Career Discovery Guide</h1>
         <p className="lead text-muted">
-          Welcome, {name}! Tell us about your interests and strengths to discover your ideal career path.
+          Welcome, {name}! Explore careers across all fields of study or filter by interests & strengths.
         </p>
         {error && (
           <div className="alert alert-danger alert-dismissible fade show" role="alert">
@@ -230,12 +236,12 @@ export default function DiscoverCareer() {
           {/* Trending paths */}
           <div className="card shadow-sm border-0 p-4 bg-white" style={{ borderRadius: "20px" }}>
             <h4 className="fw-bold text-dark mb-3">
-              <i className="bi bi-fire text-orange me-2"></i>Trending Careers
+              <i className="bi bi-fire text-warning me-2"></i>Featured Popular Careers
             </h4>
-            <p className="text-muted small">Quickly lock in one of the most popular paths:</p>
+            <p className="text-muted small">Quickly select a high-demand career path:</p>
             <div className="row g-2 mt-2">
               {trendingCareers.map((item) => (
-                <div key={item.name} className="col-sm-3">
+                <div key={item.name} className="col-sm-4">
                   <button
                     onClick={() => {
                       setSelectedCareer(item.name);
@@ -254,24 +260,6 @@ export default function DiscoverCareer() {
                   </button>
                 </div>
               ))}
-              <div className="col-sm-3">
-                <button
-                  onClick={() => {
-                    setSelectedCareer("Not sure yet");
-                    setError("");
-                  }}
-                  type="button"
-                  className={`btn w-100 py-3 rounded-4 border fw-bold d-flex flex-column align-items-center gap-1 ${
-                    selectedCareer === "Not sure yet"
-                      ? "btn-warning text-dark border-warning"
-                      : "btn-light border-warning text-dark"
-                  }`}
-                  style={{ fontSize: "0.85rem" }}
-                >
-                  <i className="bi bi-question-circle-fill fs-4 mb-1 text-warning"></i>
-                  Not Sure Yet
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -281,10 +269,10 @@ export default function DiscoverCareer() {
           {/* Career Categories */}
           <div className="card shadow-sm border-0 p-4 mb-4 bg-white" style={{ borderRadius: "20px" }}>
             <h4 className="fw-bold text-dark mb-3">
-              <i className="bi bi-grid-fill text-primary me-2"></i>3. Browse Categories
+              <i className="bi bi-grid-fill text-primary me-2"></i>3. Browse 30+ Careers by Field
             </h4>
-            <p className="text-muted small">Explore and select career options by category:</p>
-            <div className="d-flex flex-column gap-3 mt-2">
+            <p className="text-muted small">Explore options across every major domain of study:</p>
+            <div className="d-flex flex-column gap-3 mt-2" style={{ maxHeight: "480px", overflowY: "auto" }}>
               {careerCategories.map((category) => (
                 <div key={category.name} className="p-3 border rounded-4 bg-light bg-opacity-50">
                   <div className="d-flex align-items-center gap-2 mb-2">
@@ -304,7 +292,7 @@ export default function DiscoverCareer() {
                           type="button"
                           className={`btn btn-sm rounded-pill px-3 py-2 fw-semibold transition-all ${
                             isSelected
-                              ? "btn-primary text-white border-primary shadow-sm animate-pulse"
+                              ? "btn-primary text-white border-primary shadow-sm"
                               : "btn-outline-secondary bg-white text-secondary border-light"
                           }`}
                         >
@@ -318,11 +306,11 @@ export default function DiscoverCareer() {
             </div>
           </div>
 
-          {/* Match Results */}
+          {/* Dynamic Match Results */}
           <div className="card shadow-sm border-0 p-4 bg-white" style={{ borderRadius: "20px" }}>
             <div>
               <h4 className="fw-bold text-dark mb-4">
-                <i className="bi bi-lightbulb-fill text-success me-2"></i>Dynamic Match Results
+                <i className="bi bi-lightbulb-fill text-success me-2"></i>Dynamic Filter Results
               </h4>
 
               {recommendations.length === 0 ? (
@@ -334,7 +322,7 @@ export default function DiscoverCareer() {
                 </div>
               ) : (
                 <div className="d-flex flex-column gap-3">
-                  {recommendations.slice(0, 4).map((item) => {
+                  {recommendations.slice(0, 5).map((item) => {
                     const isSelected = selectedCareer === item.career;
                     return (
                       <div
@@ -398,7 +386,7 @@ export default function DiscoverCareer() {
                       Saving...
                     </>
                   ) : (
-                    "Continue"
+                    "Generate Roadmap"
                   )}
                 </button>
               </div>
@@ -411,9 +399,6 @@ export default function DiscoverCareer() {
         .hover-light:hover {
           background-color: rgba(248, 249, 250, 0.9);
           border-color: rgba(13, 110, 253, 0.2) !important;
-        }
-        .text-orange {
-          color: #ff6f00;
         }
       `}</style>
     </div>

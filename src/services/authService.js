@@ -8,6 +8,9 @@ import {
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 export const registerUser = async (email, password, name) => {
+  if (!auth) {
+    throw new Error("Firebase Auth is not initialized. Please check your Firebase environment configuration.");
+  }
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   const user = userCredential.user;
   await updateProfile(user, { displayName: name });
@@ -29,11 +32,15 @@ export const registerUser = async (email, password, name) => {
 };
 
 export const loginUser = async (email, password) => {
+  if (!auth) {
+    throw new Error("Firebase Auth is not initialized. Please check your Firebase environment configuration.");
+  }
   const userCredential = await signInWithEmailAndPassword(auth, email, password);
   return userCredential.user;
 };
 
 export const logoutUser = async () => {
+  if (!auth) return;
   return await signOut(auth);
 };
 
