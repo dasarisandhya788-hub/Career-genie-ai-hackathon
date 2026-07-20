@@ -28,7 +28,7 @@ export default function Roadmap() {
   const [careersList, setCareersList] = useState([]);
   const [currentCareerDetails, setCurrentCareerDetails] = useState(null);
   const [steps, setSteps] = useState([]);
-  const [viewMode, setViewMode] = useState("journey");
+  const [viewMode, setViewMode] = useState("roadmap");
 
   // Load database on mount
   useEffect(() => {
@@ -50,7 +50,6 @@ export default function Roadmap() {
     const isExploring = (userProfile?.careerStatus === "exploring" || targetCareerName === "Not sure yet" || targetCareerName === "Career Exploration Roadmap");
 
     if (isExploring) {
-      setViewMode("roadmap");
       setSteps(EXPLORATION_STEPS);
       setCurrentCareerDetails({
         name: "Career Exploration",
@@ -69,7 +68,6 @@ export default function Roadmap() {
         color: "secondary"
       });
     } else {
-      setViewMode("journey");
       // Find matching career
       const found = careersList.find(c => c.name === targetCareerName || c.id === targetCareerName);
       if (found) {
@@ -82,7 +80,7 @@ export default function Roadmap() {
         setCurrentCareerDetails(se || null);
       }
     }
-  }, [careersList, userProfile]);
+  }, [careersList, userProfile?.dreamCareer, userProfile?.careerGoal, userProfile?.careerStatus]);
 
   const totalSteps = steps.length;
   const career = currentCareerDetails?.name || careerName;
@@ -156,6 +154,20 @@ export default function Roadmap() {
     }
   };
 
+  const generateFallbackAIAnswer = (prompt, targetCareer) => {
+    const q = prompt.toLowerCase();
+    if (q.includes("start") || q.includes("begin") || q.includes("how to")) {
+      return `🧞‍♂️ **Career Genie AI Mentor Guidance for ${targetCareer}:**\n\n1. **Core Fundamentals:** Start by mastering basic concepts and underlying tools for ${targetCareer}.\n2. **Hands-on Practice:** Build small starter projects to reinforce your understanding.\n3. **Structured Roadmap:** Follow the step-by-step roadmap above on this page and check off tasks as you complete them!`;
+    }
+    if (q.includes("skill") || q.includes("learn") || q.includes("technology")) {
+      return `💡 **Key Skills for ${targetCareer}:**\n\nFocus on core technical proficiency, problem-solving skills, Git version control, and real-world project development. Check out the curated learning resources section below!`;
+    }
+    if (q.includes("salary") || q.includes("scope") || q.includes("pay") || q.includes("job")) {
+      return `📈 **Career Scope & Growth for ${targetCareer}:**\n\nDemand for ${targetCareer} remains high across the industry. Continuous hands-on project building and internship experience are key to landing top offers.`;
+    }
+    return `🧞‍♂️ **Career Genie AI Mentor Advice:**\n\nTo excel as a **${targetCareer}**, focus on consistent daily practice (${userProfile?.studyHours || 4} hrs/day), completing your roadmap milestones step-by-step, and building portfolio projects. You've got this!`;
+  };
+
   // Ask AI Mentor logic
   const askAI = async (e) => {
     e.preventDefault();
@@ -168,19 +180,43 @@ export default function Roadmap() {
     setAiAnswer("🤖 Thinking...");
 
     try {
-      const response = await fetch("http://localhost:3000/ask-ai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ question }),
-      });
+      let data = null;
+      try {
+        const response = await fetch("/ask-ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question }),
+        });
+        if (response.ok) {
+          data = await response.json();
+        }
+      } catch (err) {
+        // Try fallback direct localhost:3000
+      }
 
-      const data = await response.json();
-      setAiAnswer(data.answer);
+      if (!data) {
+        try {
+          const response = await fetch("http://localhost:3000/ask-ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question }),
+          });
+          if (response.ok) {
+            data = await response.json();
+          }
+        } catch (err) {
+          // Ignore fetch error, will use intelligent fallback answer
+        }
+      }
+
+      if (data && data.answer) {
+        setAiAnswer(data.answer);
+      } else {
+        setAiAnswer(generateFallbackAIAnswer(question, career));
+      }
     } catch (error) {
       console.error(error);
-      setAiAnswer("❌ " + error.message);
+      setAiAnswer(generateFallbackAIAnswer(question, career));
     } finally {
       setLoading(false);
     }

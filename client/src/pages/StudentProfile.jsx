@@ -95,7 +95,7 @@ export default function StudentProfile() {
   // Compute dynamic career recommendations from the database
   const getRecommendations = () => {
     if (careersList.length === 0) return [];
-    
+
     const scores = {};
     careersList.forEach((c) => {
       scores[c.name] = 0;
@@ -200,6 +200,7 @@ export default function StudentProfile() {
         compatEducation = "Degree";
       }
 
+      const isExploring = selectedCareer === "Not sure yet";
       await updateUserProfile(currentUser.uid, {
         name: name.trim(),
         age: Number(age),
@@ -210,7 +211,7 @@ export default function StudentProfile() {
         additionalInfo: additionalInfo.trim(),
         dreamCareer: selectedCareer,
         careerGoal: selectedCareer,
-        careerStatus: "decided",
+        careerStatus: isExploring ? "exploring" : "decided",
         progress: 0,
         completedTasks: []
       });
@@ -312,11 +313,10 @@ export default function StudentProfile() {
                       key={interest.id}
                       type="button"
                       onClick={() => handleInterestToggle(interest.id)}
-                      className={`btn px-3 py-2 rounded-pill border-2 d-flex align-items-center gap-2 fw-semibold transition-all ${
-                        isSelected
+                      className={`btn px-3 py-2 rounded-pill border-2 d-flex align-items-center gap-2 fw-semibold transition-all ${isSelected
                           ? `btn-${interest.color} border-${interest.color}`
                           : "btn-outline-secondary border-muted text-muted bg-white"
-                      }`}
+                        }`}
                       style={{ fontSize: "0.95rem" }}
                     >
                       <i className={`bi ${interest.icon}`}></i>
@@ -338,11 +338,10 @@ export default function StudentProfile() {
                       key={strength.id}
                       type="button"
                       onClick={() => handleStrengthToggle(strength.id)}
-                      className={`btn px-3 py-2 rounded-pill border-2 d-flex align-items-center gap-2 fw-semibold transition-all ${
-                        isSelected
+                      className={`btn px-3 py-2 rounded-pill border-2 d-flex align-items-center gap-2 fw-semibold transition-all ${isSelected
                           ? "btn-secondary border-secondary text-white"
                           : "btn-outline-secondary border-muted text-muted bg-white"
-                      }`}
+                        }`}
                       style={{ fontSize: "0.95rem" }}
                     >
                       <i className={`bi ${strength.icon}`}></i>
@@ -386,11 +385,10 @@ export default function StudentProfile() {
                   <div key={rec.career} className="col-md-6">
                     <div
                       onClick={() => setSelectedCareer(rec.career)}
-                      className={`card h-100 border-2 cursor-pointer shadow-sm p-4 transition-all ${
-                        isSelected
+                      className={`card h-100 border-2 cursor-pointer shadow-sm p-4 transition-all ${isSelected
                           ? `border-${rec.color} bg-${rec.color} bg-opacity-10 scale-102`
                           : "border-light bg-white hover-shadow scale-hover"
-                      }`}
+                        }`}
                       style={{
                         cursor: "pointer",
                         borderRadius: "20px",

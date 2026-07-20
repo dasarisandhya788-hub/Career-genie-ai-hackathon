@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { updateUserProfile } from "../firebase/firestoreService";
 
 export default function SelectCareer() {
+  console.log("SELECT CAREER COMPONENT LOADED");
   const { currentUser, userProfile, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [selectedCareer, setSelectedCareer] = useState("");
@@ -24,13 +25,16 @@ export default function SelectCareer() {
           desc: c.description,
           color: c.color || "primary"
         }));
-        formatted.push({
+
+        // Place "Not sure yet" at the very front for immediate visibility
+        formatted.unshift({
           id: "Not sure yet",
-          title: "Not sure yet",
-          icon: "bi-question-lg",
-          desc: "Explore potential careers and search AI-curated suggestions.",
-          color: "secondary"
+          title: "Not sure yet 🤔",
+          icon: "bi-question-circle-fill",
+          desc: "Explore potential careers, search AI-curated suggestions, and take a discovery quiz.",
+          color: "warning"
         });
+
         setCareerOptions(formatted);
       })
       .catch((err) => {
@@ -45,21 +49,21 @@ export default function SelectCareer() {
       return;
     }
 
-    if (selectedCareer === "Not sure yet") {
-      await updateUserProfile(currentUser.uid, {
-        careerStatus: "exploring"
-      });
-
-      await refreshProfile(currentUser.uid);
-
-      navigate("/student-profile");
-      return;
-    }
-
     setIsSaving(true);
     setError("");
 
     try {
+      if (selectedCareer === "Not sure yet") {
+        await updateUserProfile(currentUser.uid, {
+          dreamCareer: "Not sure yet",
+          careerGoal: "Not sure yet",
+          careerStatus: "exploring"
+        });
+        await refreshProfile(currentUser.uid);
+        navigate("/student-profile");
+        return;
+      }
+
       await updateUserProfile(currentUser.uid, {
         dreamCareer: selectedCareer,
         careerGoal: selectedCareer, // Keep in sync for compatibility

@@ -65,7 +65,7 @@ export default function Profile() {
       await updateUserProfile(currentUser.uid, {
         name,
         education,
-        dreamCareer: isExploring ? "" : dreamCareer,
+        dreamCareer: dreamCareer,
         careerGoal: dreamCareer, // for backwards compatibility
         careerStatus: isExploring ? "exploring" : "decided",
         studyHours

@@ -133,13 +133,14 @@ export default function DiscoverCareer() {
     setError("");
 
     try {
+      const isExploring = selectedCareer === "Not sure yet";
       await updateUserProfile(currentUser.uid, {
         dreamCareer: selectedCareer,
         careerGoal: selectedCareer,
-        careerStatus: "decided"
+        careerStatus: isExploring ? "exploring" : "decided"
       });
       await refreshProfile(currentUser.uid);
-      navigate("/dashboard");
+      navigate(isExploring ? "/roadmap" : "/dashboard");
     } catch (err) {
       console.error("Error saving dream career from discover:", err);
       setError("Failed to save your career selection. Please try again.");
@@ -234,7 +235,7 @@ export default function DiscoverCareer() {
             <p className="text-muted small">Quickly lock in one of the most popular paths:</p>
             <div className="row g-2 mt-2">
               {trendingCareers.map((item) => (
-                <div key={item.name} className="col-sm-4">
+                <div key={item.name} className="col-sm-3">
                   <button
                     onClick={() => {
                       setSelectedCareer(item.name);
@@ -253,6 +254,24 @@ export default function DiscoverCareer() {
                   </button>
                 </div>
               ))}
+              <div className="col-sm-3">
+                <button
+                  onClick={() => {
+                    setSelectedCareer("Not sure yet");
+                    setError("");
+                  }}
+                  type="button"
+                  className={`btn w-100 py-3 rounded-4 border fw-bold d-flex flex-column align-items-center gap-1 ${
+                    selectedCareer === "Not sure yet"
+                      ? "btn-warning text-dark border-warning"
+                      : "btn-light border-warning text-dark"
+                  }`}
+                  style={{ fontSize: "0.85rem" }}
+                >
+                  <i className="bi bi-question-circle-fill fs-4 mb-1 text-warning"></i>
+                  Not Sure Yet
+                </button>
+              </div>
             </div>
           </div>
         </div>

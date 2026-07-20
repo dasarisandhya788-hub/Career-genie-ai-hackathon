@@ -58,11 +58,12 @@ export default function StudentDetails() {
 
     if (currentUser) {
       try {
+        const isExploring = career === "Not sure yet";
         await updateUserProfile(currentUser.uid, {
           name,
           dreamCareer: career,
           careerGoal: career,
-          careerStatus: "decided",
+          careerStatus: isExploring ? "exploring" : "decided",
           education,
           studyHours,
           progress: 0,
@@ -82,7 +83,8 @@ export default function StudentDetails() {
       try {
         await updateUserProfile(currentUser.uid, {
           careerStatus: "exploring",
-          dreamCareer: ""
+          dreamCareer: "Not sure yet",
+          careerGoal: "Not sure yet"
         });
         await refreshProfile(currentUser.uid);
       } catch (err) {
@@ -169,6 +171,7 @@ export default function StudentDetails() {
                 value={career}
                 onChange={(e) => setCareer(e.target.value)}
               >
+                <option value="Not sure yet">Not sure yet 🤔</option>
                 {careersList.map((c) => (
                   <option key={c.id || c.name} value={c.name}>
                     {c.name}

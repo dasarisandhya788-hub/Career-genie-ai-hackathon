@@ -102,8 +102,8 @@ export default function Dashboard() {
               <p className="mb-2 text-secondary">
                 <i className="bi bi-star-fill me-2 text-warning"></i>
                 <strong>Career Selected:</strong>{" "}
-                <span className="badge bg-primary bg-opacity-10 text-primary fw-bold">
-                  {dreamCareer || "Not selected yet"}
+                <span className={`badge ${dreamCareer === "Not sure yet" || careerStatus === "exploring" ? "bg-warning bg-opacity-25 text-dark" : "bg-primary bg-opacity-10 text-primary"} fw-bold`}>
+                  {dreamCareer === "Not sure yet" || careerStatus === "exploring" ? "Not sure yet (Exploring)" : (dreamCareer || "Not selected yet")}
                 </span>
               </p>
               <p className="mb-2 text-secondary">
@@ -144,16 +144,23 @@ export default function Dashboard() {
               <div>
                 <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
                   <div>
-                    <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold mb-2">
-                      Active Career Path
+                    <span className={`badge ${dreamCareer === "Not sure yet" || careerStatus === "exploring" ? "bg-warning text-dark" : "bg-primary bg-opacity-10 text-primary"} px-3 py-2 rounded-pill fw-bold mb-2`}>
+                      {dreamCareer === "Not sure yet" || careerStatus === "exploring" ? "Exploration Mode" : "Active Career Path"}
                     </span>
                     <h3 className="fw-bold mb-0 text-dark">
-                      {dreamCareer}
+                      {dreamCareer === "Not sure yet" || careerStatus === "exploring" ? "Not Sure Yet 🤔" : dreamCareer}
                     </h3>
                   </div>
-                  <Link to="/select-career" className="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                    <i className="bi bi-pencil me-1"></i>Change Career Dream
-                  </Link>
+                  <div className="d-flex gap-2">
+                    { (dreamCareer === "Not sure yet" || careerStatus === "exploring") && (
+                      <Link to="/student-profile" className="btn btn-warning btn-sm rounded-pill px-3 fw-semibold text-dark">
+                        <i className="bi bi-compass me-1"></i>Take Discovery Quiz
+                      </Link>
+                    )}
+                    <Link to="/select-career" className="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                      <i className="bi bi-pencil me-1"></i>Change Career
+                    </Link>
+                  </div>
                 </div>
 
                 {/* Progress bar */}
@@ -176,11 +183,17 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="alert alert-primary border-0 bg-primary bg-opacity-10 text-primary d-flex align-items-center py-3 px-4 mb-4 rounded-4" role="alert">
-                  <span className="fs-2 me-3">🚀</span>
+                <div className={`alert ${dreamCareer === "Not sure yet" || careerStatus === "exploring" ? "alert-warning border-0 bg-warning bg-opacity-15 text-dark" : "alert-primary border-0 bg-primary bg-opacity-10 text-primary"} d-flex align-items-center py-3 px-4 mb-4 rounded-4`} role="alert">
+                  <span className="fs-2 me-3">{dreamCareer === "Not sure yet" || careerStatus === "exploring" ? "🧭" : "🚀"}</span>
                   <div>
-                    <h6 className="fw-bold mb-1">Stay Focused & Consistent!</h6>
-                    <small>You have completed {completedCount} steps on your path to becoming a {dreamCareer}.</small>
+                    <h6 className="fw-bold mb-1">
+                      {dreamCareer === "Not sure yet" || careerStatus === "exploring" ? "Explore & Discover Your Path!" : "Stay Focused & Consistent!"}
+                    </h6>
+                    <small>
+                      {dreamCareer === "Not sure yet" || careerStatus === "exploring"
+                        ? `You are currently in exploration mode. You have completed ${completedCount} steps on your discovery journey.`
+                        : `You have completed ${completedCount} steps on your path to becoming a ${dreamCareer}.`}
+                    </small>
                   </div>
                 </div>
               </div>

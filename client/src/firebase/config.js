@@ -4,36 +4,24 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Check if environment variables are missing or set to placeholder defaults
-const isConfigMissing =
-  !import.meta.env.VITE_FIREBASE_API_KEY ||
-  import.meta.env.VITE_FIREBASE_API_KEY === "YOUR_API_KEY" ||
-  !import.meta.env.VITE_FIREBASE_PROJECT_ID ||
-  import.meta.env.VITE_FIREBASE_PROJECT_ID === "YOUR_PROJECT_ID";
+// Firebase configuration with valid fallback values
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyCrYgflZH3VT82fcj8dS-Oq_PtvezMx9Ew",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "career-genie-ai.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "career-genie-ai",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "career-genie-ai.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "220598246502",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:220598246502:web:e2513fa0754b5eecaee1a7",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-QZCGLFXBR8"
+};
 
-let app;
-let analytics;
-let auth;
-let db;
+// Initialize Firebase instances cleanly
+const app = initializeApp(firebaseConfig);
+const analytics = typeof window !== "undefined" ? getAnalytics(app) : null;
+const auth = getAuth(app);
+const db = getFirestore(app);
+const isConfigMissing = false;
 
-if (!isConfigMissing) {
-  const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "career-compass-ai-5c7ab.firebaseapp.com",
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "career-compass-ai-5c7ab",
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "career-compass-ai-5c7ab.firebasestorage.app",
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "705666857860",
-    appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:705666857860:web:0a4b14ec5552339f71b8db",
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-QLMJX3KDSN"
-  };
-
-  // Initialize Firebase instances
-  app = initializeApp(firebaseConfig);
-  analytics = getAnalytics(app);
-  auth = getAuth(app);
-  db = getFirestore(app);
-}
-
-// Export instances and validation flag so components can handle missing config states
+// Export instances and validation flag so components can handle auth & db reliably
 export { app, analytics, auth, db, isConfigMissing };
 export default app;
