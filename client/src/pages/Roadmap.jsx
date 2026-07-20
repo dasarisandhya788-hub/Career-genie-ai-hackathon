@@ -56,25 +56,39 @@ export default function Roadmap() {
     userProfile?.careerStatus !== "exploring"
   );
 
+  const getDefaultStepsForCareer = (cName) => {
+    const target = cName || "Chosen Goal";
+    return [
+      `Learn core fundamentals & foundational concepts for ${target}`,
+      `Master essential tools, analytical methods & practical skills for ${target}`,
+      `Build 3+ hands-on practical portfolio projects for ${target}`,
+      `Complete specialized certifications & practical industry training for ${target}`,
+      `Apply for relevant internships / entry-level roles in ${target}`,
+      `Prepare for technical interviews, domain assessments & full-time career placement`
+    ];
+  };
+
   // Set steps and career details based on profile loading and careersList
   useEffect(() => {
-    if (careersList.length === 0 || !hasSelectedCareer) return;
+    if (!hasSelectedCareer) return;
 
-    if (!hasSelectedCareer) {
-      setViewMode("roadmap");
-      setSteps(EXPLORATION_STEPS);
+    let found = null;
+    if (careersList.length > 0) {
+      const targetLower = targetCareerName.toLowerCase();
+      found = careersList.find(c => 
+        c.name?.toLowerCase() === targetLower || 
+        c.id?.toLowerCase() === targetLower ||
+        targetLower.includes(c.name?.toLowerCase()) ||
+        c.name?.toLowerCase().includes(targetLower)
+      );
+    }
+
+    if (found && found.roadmap && found.roadmap.length > 0) {
+      setSteps(found.roadmap);
+      setCurrentCareerDetails(found);
     } else {
-      setViewMode("journey");
-      // Find matching career
-      const found = careersList.find(c => c.name === targetCareerName || c.id === targetCareerName);
-      if (found) {
-        setSteps(found.roadmap || []);
-        setCurrentCareerDetails(found);
-      } else {
-        const se = careersList.find(c => c.id === "software-engineer" || c.name === "Software Engineer");
-        setSteps(se ? se.roadmap : []);
-        setCurrentCareerDetails(se || null);
-      }
+      setSteps(getDefaultStepsForCareer(targetCareerName));
+      if (found) setCurrentCareerDetails(found);
     }
   }, [careersList, userProfile, hasSelectedCareer, targetCareerName]);
 
